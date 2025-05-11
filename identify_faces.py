@@ -14,7 +14,8 @@ def get_photos(photo_dir):
     return list(filelist)
 
 
-def save_photo(img, match_result, image_path, photo_dir, output_dir):
+def save_photo(img, match_result, image_path, photo_dir, output_dir,
+               no_result_copy=False):
     user_name = match_result.name
     filename = str(image_path).replace(f"{photo_dir}/", "")
 
@@ -22,12 +23,14 @@ def save_photo(img, match_result, image_path, photo_dir, output_dir):
     output_path = Path(output_dir) / user_name / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(image_path, output_path)
+    print(f"Saved {output_path}")
 
     # Image for confirmation
+    if no_result_copy:
+        return
     confirm_output_path = Path(output_dir) / "_confirm" / user_name / filename
     confirm_output_path.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(confirm_output_path, img)
-    print(f"Saved {output_path}")
 
 
 # 類似度の算出のための関数（コサイン類似度）
@@ -100,6 +103,9 @@ def main():
     parser.add_argument("-o", "--output_dir", type=str,
                         default="output",
                         help="Output directory")
+    parser.add_argument("--no_result_copy",
+                        action="store_true",
+                        help="Do not copy the detected result image")
     parser.add_argument("photo_dir", type=str,
                         help="Path to the image directory")
     args = parser.parse_args()
@@ -108,6 +114,7 @@ def main():
     embedding_dir = args.embedding_dir
     output_dir = args.output_dir
     threshold = args.threshold
+    no_result_copy = args.no_result_copy
 
     app = FaceAnalysis()
     app.prepare(ctx_id=-1)
@@ -149,7 +156,8 @@ def main():
 
         # 検出結果を保存
         for match_result in matched_faces:
-            save_photo(img, match_result, file_path, photo_dir, output_dir)
+            save_photo(img, match_result, file_path, photo_dir, output_dir,
+                       no_result_copy=no_result_copy)
 
 
 if __name__ == "__main__":
