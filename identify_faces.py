@@ -15,9 +15,12 @@ def get_photos(photo_dir):
 
 
 def save_photo(img, match_result, image_path, photo_dir, output_dir,
-               no_result_copy=False):
+               no_result_copy=False, flat_output=False):
     user_name = match_result.name
-    filename = str(image_path).replace(f"{photo_dir}/", "")
+    if flat_output:
+        filename = image_path.name
+    else:
+        filename = str(image_path).replace(f"{photo_dir}/", "")
 
     # Original image
     output_path = Path(output_dir) / user_name / filename
@@ -106,6 +109,9 @@ def main():
     parser.add_argument("--no_result_copy",
                         action="store_true",
                         help="Do not copy the detected result image")
+    parser.add_argument("--flat_output",
+                        action="store_true",
+                        help="Flatten the output directory structure")
     parser.add_argument("photo_dir", type=str,
                         help="Path to the image directory")
     args = parser.parse_args()
@@ -115,6 +121,7 @@ def main():
     output_dir = args.output_dir
     threshold = args.threshold
     no_result_copy = args.no_result_copy
+    flat_output = args.flat_output
 
     app = FaceAnalysis()
     app.prepare(ctx_id=-1)
@@ -157,7 +164,8 @@ def main():
         # 検出結果を保存
         for match_result in matched_faces:
             save_photo(img, match_result, file_path, photo_dir, output_dir,
-                       no_result_copy=no_result_copy)
+                       no_result_copy=no_result_copy,
+                       flat_output=flat_output)
 
 
 if __name__ == "__main__":
