@@ -9,8 +9,13 @@ from insightface.app.common import Face
 from util import draw_faces
 
 
+FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG")
+
+
 def get_photos(photo_dir):
-    filelist = Path(photo_dir).glob("**/*.jpg")
+    filelist = []
+    for ext in FILE_TYPES:
+        filelist.extend(Path(photo_dir).glob(f"**/*.{ext}"))
     return list(filelist)
 
 
