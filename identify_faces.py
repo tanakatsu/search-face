@@ -160,7 +160,7 @@ def main():
 
         if len(matched_faces) == 0:
             print("No matched face.")
-            break
+            continue
 
         print(f"Number of matched faces: {len(matched_faces)}")
         faces, names = zip(*[[m.face, m.name] for m in matched_faces])
