@@ -1,4 +1,8 @@
 import cv2
+import pillow_heif
+import numpy as np
+from pathlib import Path
+from PIL import Image
 
 
 FACE_BORDER_COLOR = (0, 255, 255)  # (Blue, Green, Red)
@@ -42,4 +46,14 @@ def draw_faces(img, faces, names=None):
         cv2.putText(img, name, (text_x, text_y),
                     cv2.FONT_HERSHEY_COMPLEX,
                     NAME_SIZE, NAME_COLOR, NAME_THICKNESS)
+    return img
+
+
+def read_image(image_path: str | Path) -> np.ndarray:
+    if Path(image_path).suffix in (".HEIC", ".heic"):
+        pillow_heif.register_heif_opener()
+        image = Image.open(image_path)
+        img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    else:
+        img = cv2.imread(str(image_path))
     return img

@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from insightface.app import FaceAnalysis
 from insightface.app.common import Face
-from util import draw_faces
+from util import draw_faces, read_image
 
 
-FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG")
+FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG", "png", "PNG", "heic", "HEIC")
 
 
 def get_photos(photo_dir):
@@ -146,7 +146,7 @@ def main():
 
     for file_path in filelist:
         print(f"Processing {file_path}...")
-        img = cv2.imread(file_path)
+        img = read_image(file_path)
 
         # 顔の検出
         faces = app.get(img)

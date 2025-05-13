@@ -3,7 +3,7 @@ import numpy as np
 from argparse import ArgumentParser
 from pathlib import Path
 from insightface.app import FaceAnalysis
-from util import create_temp_names, draw_faces
+from util import create_temp_names, draw_faces, read_image
 
 
 def save_face_embeddings(faces, names, output_dir):
@@ -26,7 +26,7 @@ def main():
     img_path = args.img_path
     output_dir = args.output_dir
 
-    img = cv2.imread(img_path)
+    img = read_image(img_path)
 
     app = FaceAnalysis()
     app.prepare(ctx_id=-1)
