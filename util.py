@@ -1,5 +1,4 @@
 import cv2
-import string
 
 
 FACE_BORDER_COLOR = (0, 255, 255)  # (Blue, Green, Red)
@@ -9,11 +8,10 @@ NAME_COLOR = (0, 255, 0)
 NAME_THICKNESS = 2
 
 
-def create_temp_names(num, prefix="unknown_"):
-    az_list = list(string.ascii_uppercase)
+def create_temp_names(num, prefix="face_"):
     names = []
-    for i in range(num):
-        temp_name = prefix + az_list[i]
+    for i in range(1, num+1):
+        temp_name = prefix + str(i)
         names.append(temp_name)
     return names
 
