@@ -1,12 +1,10 @@
 import cv2
-import numpy as np
 import shutil
 from argparse import ArgumentParser
-from dataclasses import dataclass
 from pathlib import Path
 from insightface.app import FaceAnalysis
-from insightface.app.common import Face
 from util import draw_faces, read_image
+from fr import UserFaceSet
 
 
 FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG", "png", "PNG", "heic", "HEIC")
@@ -39,67 +37,6 @@ def save_photo(img, match_result, image_path, photo_dir, output_dir,
     confirm_output_path = Path(output_dir) / "_confirm" / user_name / filename
     confirm_output_path.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(confirm_output_path, img)
-
-
-# 類似度の算出のための関数（コサイン類似度）
-def cos_sim(feat1, feat2):
-    feat1_norm = np.linalg.norm(feat1)
-    feat2_norm = np.linalg.norm(feat2)
-    return np.dot(feat1, feat2) / (feat1_norm * feat2_norm)
-
-
-@dataclass
-class MatchResult:
-    name: str
-    similarity: float
-    face: Face
-
-
-class UserFace:
-    def __init__(self, name):
-        self.name = name
-        self.embeddings = []
-
-    def match_face(self, face):
-        similarities = [cos_sim(emb, face.embedding) for emb in self.embeddings]
-        return MatchResult(self.name, max(similarities), face)
-
-    def load(self, user_embedding_dir):
-        embedding_files = Path(user_embedding_dir).glob("*.npy")
-        for embedding_file in embedding_files:
-            embedding = np.load(embedding_file)
-            self.embeddings.append(embedding)
-
-
-class UserFaceSet():
-    def __init__(self, users_faces: list[UserFace]):
-        self.users_faces = users_faces
-
-    def most_match_face(self, face):
-        match_results = []
-        for user_face in self.users_faces:
-            result = user_face.match_face(face)
-            match_results.append(result)
-
-        most_match_face = sorted(match_results,
-                                 key=lambda x: x.similarity,
-                                 reverse=True)[0]
-        return most_match_face
-
-    @classmethod
-    def from_dir(cls, embedding_dir):
-        users_faces = []
-        for user_dir in Path(embedding_dir).iterdir():
-            if user_dir.is_file():
-                continue
-
-            user_name = user_dir.name
-            user_face = UserFace(user_name)
-            user_face.load(user_dir)
-
-            users_faces.append(user_face)
-
-        return cls(users_faces)
 
 
 def main():
@@ -151,9 +88,13 @@ def main():
         # 顔の検出
         faces = app.get(img)
 
-        matched_faces = []
+        match_results = []
         for face in faces:
             match_result = users_faceset.most_match_face(face)
+            match_results.append(match_result)
+
+        matched_faces = []
+        for match_result in match_results:
             if match_result.similarity >= threshold:
                 print(f"Matched face: {match_result.name} ({match_result.similarity})")
                 matched_faces.append(match_result)
