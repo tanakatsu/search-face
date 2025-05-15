@@ -1,27 +1,33 @@
 import cv2
+import numpy as np
 import shutil
+from collections import Counter
 from argparse import ArgumentParser
 from pathlib import Path
 from insightface.app import FaceAnalysis
 from util import draw_faces, read_image
-from fr import UserFaceSet
+from fr import UserFaceSet, MatchResult
 
 
 FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG", "png", "PNG", "heic", "HEIC")
 
 
-def get_photos(photo_dir):
+def get_photos(photo_dir: str) -> list[Path]:
     filelist = []
     for ext in FILE_TYPES:
         filelist.extend(Path(photo_dir).glob(f"**/*.{ext}"))
     return list(filelist)
 
 
-def save_photo(img, match_result, image_path, photo_dir, output_dir,
-               no_result_copy=False, flat_output=False):
+def save_photo(img: np.ndarray, match_result: MatchResult,
+               image_path: Path, photo_dir: str, output_dir: str,
+               no_result_copy: bool = False, flat_output: bool = False,
+               suffix: str = ""):
     user_name = match_result.name
     if flat_output:
         filename = image_path.name
+        if suffix:
+            filename = filename.replace(".", f"{suffix}.")  # example.jpg -> example(1).jpg
     else:
         filename = str(image_path).replace(f"{photo_dir}/", "")
 
@@ -37,6 +43,23 @@ def save_photo(img, match_result, image_path, photo_dir, output_dir,
     confirm_output_path = Path(output_dir) / "_confirm" / user_name / filename
     confirm_output_path.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(confirm_output_path, img)
+
+
+def find_duplicates(filelist: list[Path]) -> dict[Path, int]:
+    dup_files = {p: 0 for p, cnt in Counter(filelist).items() if cnt > 1}
+    return dup_files
+
+
+def get_suffix_num(file_path: Path, dup_files: dict[Path, int]) -> str:
+    if file_path not in dup_files:
+        return ""
+
+    cnt = dup_files[file_path]
+    if cnt == 0:  # first one
+        return ""
+
+    # second or later
+    return f"({cnt})"
 
 
 def main():
@@ -81,6 +104,8 @@ def main():
         return
     print(f"Found {len(filelist)} pictures.")
 
+    duplicated_files = find_duplicates(filelist)
+
     for file_path in filelist:
         print(f"Processing {file_path}...")
         img = read_image(file_path)
@@ -109,9 +134,16 @@ def main():
 
         # 検出結果を保存
         for match_result in matched_faces:
+            if flat_output:
+                suffix = get_suffix_num(file_path, duplicated_files)
+                if suffix:
+                    duplicated_files[file_path] += 1
+            else:
+                suffix = ""
             save_photo(img, match_result, file_path, photo_dir, output_dir,
                        no_result_copy=no_result_copy,
-                       flat_output=flat_output)
+                       flat_output=flat_output,
+                       suffix=suffix)
 
 
 if __name__ == "__main__":
