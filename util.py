@@ -1,8 +1,10 @@
 import cv2
 import pillow_heif
 import numpy as np
+from insightface.app.common import Face
 from pathlib import Path
 from PIL import Image
+from typing import Optional
 
 
 FACE_BORDER_COLOR = (0, 255, 255)  # (Blue, Green, Red)
@@ -12,7 +14,7 @@ NAME_COLOR = (0, 255, 0)
 NAME_THICKNESS = 2
 
 
-def create_temp_names(num, prefix="face_"):
+def create_temp_names(num: int, prefix: str = "face_") -> list[str]:
     names = []
     for i in range(1, num+1):
         temp_name = prefix + str(i)
@@ -20,7 +22,7 @@ def create_temp_names(num, prefix="face_"):
     return names
 
 
-def draw_faces(img, faces, names=None):
+def draw_faces(img: np.ndarray, faces: list[Face], names: Optional[list[str]] = None):
     height, width = img.shape[:2]
 
     if names:

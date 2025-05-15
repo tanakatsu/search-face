@@ -3,10 +3,11 @@ import numpy as np
 from argparse import ArgumentParser
 from pathlib import Path
 from insightface.app import FaceAnalysis
+from insightface.app.common import Face
 from util import create_temp_names, draw_faces, read_image
 
 
-def save_face_embeddings(faces, names, output_dir):
+def save_face_embeddings(faces: list[Face], names: list[str], output_dir: str) -> None:
     assert len(faces) == len(names), "Number of faces and names must match"
 
     for face, name in zip(faces, names):
