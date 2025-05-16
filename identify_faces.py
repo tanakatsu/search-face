@@ -46,15 +46,17 @@ def save_photo(img: np.ndarray, match_result: MatchResult,
 
 
 def find_duplicates(filelist: list[Path]) -> dict[Path, int]:
-    dup_files = {p: 0 for p, cnt in Counter(filelist).items() if cnt > 1}
+    filenames = [f.name for f in filelist]
+    dup_files = {p: 0 for p, cnt in Counter(filenames).items() if cnt > 1}
     return dup_files
 
 
 def get_suffix_num(file_path: Path, dup_files: dict[Path, int]) -> str:
-    if file_path not in dup_files:
+    filename = file_path.name
+    if filename not in dup_files:
         return ""
 
-    cnt = dup_files[file_path]
+    cnt = dup_files[filename]
     if cnt == 0:  # first one
         return ""
 
