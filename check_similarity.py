@@ -60,6 +60,7 @@ def main():
 
     tmp_names = create_temp_names(len(match_results))
     similarities = [m.similarity for m in match_results]
+    faces = [m.face for m in match_results]  # sorted order
 
     if top_n is not None:
         faces = faces[:top_n]
