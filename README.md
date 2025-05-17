@@ -54,7 +54,7 @@
 
     ```
     ├── registered_faces/
-    │   └── user_A/
+    │   └── user_A/    # Note: Multiple faces can be registered
     │   │   └── face_1.npy
     │   └── user_B/
     │       └── face_2.npy
@@ -90,3 +90,25 @@
     │       └── user_B/
     │           └── t1.jpg
     ```
+
+1. Check faces similarites with registered faces
+
+    ```bash
+    python check_similarity.py -u user_A sample_album/t1.jpg
+    ```
+
+    This will output the similarity scores of the faces in `sample_album/t1.jpg` against the registered faces of `user_A`.
+
+    ```
+    Found 6 faces.
+    face_1: 1.000
+    face_2: 0.064
+    face_3: 0.036
+    face_4: -0.010
+    face_5: -0.029
+    face_6: -0.083
+    ```
+
+    The scores are between -1 and 1, where 1 means the same face and -1 means completely different faces. The closer to 1, the more similar the faces are.
+
+    Also, `output.jpg` will be created with the detected faces and names (`face_1`, `face_2`, etc.)
