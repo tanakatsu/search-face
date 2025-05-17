@@ -42,7 +42,6 @@ def main():
     img_path = args.img_path
     output_dir = args.output_dir
     save_face_image_flag = args.save_face_image
-    import pdb; pdb.set_trace()
 
     img = read_image(img_path)
 
