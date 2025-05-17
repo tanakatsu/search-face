@@ -42,7 +42,7 @@ def save_photo(img: np.ndarray, match_result: MatchResult,
         return
     confirm_output_path = Path(output_dir) / "_confirm" / user_name / filename
     confirm_output_path.parent.mkdir(parents=True, exist_ok=True)
-    cv2.imwrite(confirm_output_path, img)
+    cv2.imwrite(confirm_output_path.with_suffix(".jpg"), img)
 
 
 def find_duplicates(filelist: list[Path]) -> dict[str, int]:
