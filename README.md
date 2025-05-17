@@ -112,3 +112,5 @@
     The scores are between -1 and 1, where 1 means the same face and -1 means completely different faces. The closer to 1, the more similar the faces are.
 
     Also, `output.jpg` will be created with the detected faces and names (`face_1`, `face_2`, etc.)
+
+    This will be useful for adjusting the threshold for the `identify_faces.py` script.
