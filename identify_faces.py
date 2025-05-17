@@ -69,7 +69,7 @@ def main():
     parser.add_argument("--embedding_dir", type=str,
                         default="registered_faces",
                         help="Directory containing face embeddings")
-    parser.add_argument("--threshold", type=float, default=0.7)
+    parser.add_argument("--threshold", type=float, default=0.5)
     parser.add_argument("-o", "--output_dir", type=str,
                         default="output",
                         help="Output directory")
