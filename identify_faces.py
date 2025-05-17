@@ -45,9 +45,9 @@ def save_photo(img: np.ndarray, match_result: MatchResult,
     cv2.imwrite(confirm_output_path, img)
 
 
-def find_duplicates(filelist: list[Path]) -> dict[Path, int]:
+def find_duplicates(filelist: list[Path]) -> dict[str, int]:
     filenames = [f.name for f in filelist]
-    dup_files = {p: 0 for p, cnt in Counter(filenames).items() if cnt > 1}
+    dup_files = {name: 0 for name, cnt in Counter(filenames).items() if cnt > 1}
     return dup_files
 
 
