@@ -52,7 +52,7 @@ def draw_faces(img: np.ndarray, faces: list[Face], names: Optional[list[str]] = 
 
 
 def read_image(image_path: str | Path) -> np.ndarray:
-    if Path(image_path).suffix in (".HEIC", ".heic"):
+    if Path(image_path).suffix in (".HEIC", ".heic", ".HEIF", ".heif"):
         pillow_heif.register_heif_opener()
         image = Image.open(image_path)
         img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)

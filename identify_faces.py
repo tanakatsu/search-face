@@ -9,7 +9,8 @@ from util import draw_faces, read_image
 from fr import UserFaceSet, MatchResult
 
 
-FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG", "png", "PNG", "heic", "HEIC")
+FILE_TYPES = ("jpg", "jpeg", "JPG", "JPEG", "png", "PNG",
+              "heic", "HEIC", "heif", "HEIF")
 
 
 def get_photos(photo_dir: str) -> list[Path]:
