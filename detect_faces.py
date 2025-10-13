@@ -31,6 +31,16 @@ def save_face_images(img: np.ndarray, faces: list[Face], names: list[str], outpu
         cv2.imwrite(output_path, face_img)
 
 
+def validate_face_bbox(face: Face) -> bool:
+    if face.bbox is None:
+        return False
+
+    left, top, right, bottom = face.bbox
+    if left < 0 or top < 0 or right <= left or bottom <= top:
+        return False
+    return True
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("--output_dir", type=str, default="detected")
@@ -51,6 +61,7 @@ def main():
 
     # 顔検出
     faces = app.get(img)
+    faces = [face for face in faces if validate_face_bbox(face)]
 
     if len(faces) == 0:
         print("No faces detected.")
