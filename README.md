@@ -11,17 +11,10 @@
    cd search-face
     ````
 
-1. Create a virtual environment (optional but recommended)
+1. Install dependencies with [uv](https://docs.astral.sh/uv/)
 
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
-
-1. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
 1. Get sample photo
@@ -33,7 +26,7 @@
 1. Detect faces
 
    ```bash
-   python detect_faces.py t1.jpg
+   uv run detect_faces.py t1.jpg
    ```
    This will create a `detected` directory with the detected face features (`face_*.npy`) and an annotated image (`result.jpg`).
 
@@ -74,7 +67,7 @@
 
 1. Identify faces
     ```bash
-    python identify_faces.py sample_album  # Note: You can change matching level by --threshold option
+    uv run identify_faces.py sample_album  # Note: You can change matching level by --threshold option
     ```
 
     This will create an `output` directory with the identified faces photos and a `_confirm` directory for confirmation (annotated images).
@@ -94,7 +87,7 @@
 1. Check faces similarites with registered faces
 
     ```bash
-    python check_similarity.py -u user_A sample_album/t1.jpg
+    uv run check_similarity.py -u user_A sample_album/t1.jpg
     ```
 
     This will output the similarity scores of the faces in `sample_album/t1.jpg` against the registered faces of `user_A`.
