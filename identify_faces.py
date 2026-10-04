@@ -65,6 +65,22 @@ def get_suffix_num(file_path: Path, dup_files: dict[Path, int]) -> str:
     return f"({cnt})"
 
 
+def print_summary(total: int, no_face: int, no_match: int, below_threshold: int,
+                  per_person: dict[str, dict[Path, float]]):
+    matched = total - no_face - no_match
+    print("\n===== Summary =====")
+    print(f"Photos: {total} (matched {matched} / no match {no_match} / no face {no_face})")
+    print(f"Faces below threshold: {below_threshold}")
+
+    # 写真枚数の多い順
+    for name, photos in sorted(per_person.items(), key=lambda kv: -len(kv[1])):
+        sims = list(photos.values())
+        print(f"\n[{name}] {len(photos)} photos "
+              f"(avg sim {sum(sims) / len(sims):.2f}, min {min(sims):.2f})")
+        for path, sim in sorted(photos.items()):
+            print(f"  {sim:.2f}  {path}")
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("--embedding_dir", type=str,
@@ -109,12 +125,19 @@ def main():
 
     duplicated_files = find_duplicates(filelist)
 
+    no_face = 0
+    no_match = 0
+    below_threshold = 0
+    per_person: dict[str, dict[Path, float]] = {}  # name -> {photo: best similarity}
+
     for file_path in filelist:
         print(f"Processing {file_path}...")
         img = read_image(file_path)
 
         # 顔の検出
         faces = app.get(img)
+        if len(faces) == 0:
+            no_face += 1
 
         match_results = []
         for face in faces:
@@ -126,10 +149,18 @@ def main():
             if match_result.similarity >= threshold:
                 print(f"Matched face: {match_result.name} ({match_result.similarity})")
                 matched_faces.append(match_result)
+            else:
+                below_threshold += 1
 
         if len(matched_faces) == 0:
             print("No matched face.")
+            if len(faces) > 0:
+                no_match += 1
             continue
+
+        for m in matched_faces:
+            photos = per_person.setdefault(m.name, {})
+            photos[file_path] = max(m.similarity, photos.get(file_path, 0.0))
 
         print(f"Number of matched faces: {len(matched_faces)}")
         faces, names = zip(*[[m.face, m.name] for m in matched_faces])
@@ -147,6 +178,8 @@ def main():
                        no_result_copy=no_result_copy,
                        flat_output=flat_output,
                        suffix=suffix)
+
+    print_summary(len(filelist), no_face, no_match, below_threshold, per_person)
 
 
 if __name__ == "__main__":
