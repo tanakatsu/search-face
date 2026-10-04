@@ -167,13 +167,12 @@ def main():
         img = draw_faces(img, faces, names)
 
         # 検出結果を保存
+        suffix = ""
+        if flat_output:
+            suffix = get_suffix_num(file_path, duplicated_files)
+            if file_path.name in duplicated_files:
+                duplicated_files[file_path.name] += 1
         for match_result in matched_faces:
-            if flat_output:
-                suffix = get_suffix_num(file_path, duplicated_files)
-                if suffix:
-                    duplicated_files[file_path] += 1
-            else:
-                suffix = ""
             save_photo(img, match_result, file_path, photo_dir, output_dir,
                        no_result_copy=no_result_copy,
                        flat_output=flat_output,
